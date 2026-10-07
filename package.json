@@ -1,24 +1,32 @@
 {
-  "name": "covert-social-deduction",
+  "name": "theft-police-and-undercover",
   "version": "1.0.0",
-  "description": "Covert Social Deduction Game with MongoDB integration",
-  "main": "server.js",
+  "description": "Real-time multiplayer social-deduction game: THEFT: Police & Undercover",
+  "private": true,
+  "workspaces": [
+    "shared",
+    "server",
+    "client"
+  ],
   "scripts": {
-    "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "build": "npm --prefix shared run build && npm --prefix server run build && npm --prefix client run build",
+    "start": "node server/dist/server.js",
+    "install:all": "npm install && npm --prefix shared install && npm --prefix server install && npm --prefix client install"
   },
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "mongodb": "^6.8.0"
+  "devDependencies": {
+    "concurrently": "^8.2.2"
   },
   "keywords": [
-    "mongodb",
     "social-deduction",
-    "imposter",
-    "tailwind"
+    "multiplayer",
+    "socketio",
+    "react",
+    "mongodb",
+    "theft-game"
   ],
-  "author": "",
+  "author": "Narsimha",
   "license": "ISC"
 }

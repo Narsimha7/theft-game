@@ -7,6 +7,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const url = require('url');
 // Load .env file automatically if present
 try {
   const envPath = path.join(__dirname, '.env');

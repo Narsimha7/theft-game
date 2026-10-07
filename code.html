@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>COVERT // Social Deduction Elimination Council</title>
+  <meta name="description" content="High-stakes social deduction elimination terminal. Cross-examine clues, audit behavioral discrepancies, and cast your verified signature."/>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Syne:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            surface: {
+              DEFAULT: "#0a0e17",
+              card: "#121724",
+              cardHover: "#182032",
+              elevated: "#1c2438",
+              border: "rgba(255, 255, 255, 0.08)",
+              borderStrong: "rgba(255, 255, 255, 0.16)"
+            },
+            primary: {
+              DEFAULT: "#6366f1",
+              hover: "#4f46e5",
+              glow: "rgba(99, 102, 241, 0.25)"
+            },
+            crimson: {
+              DEFAULT: "#f43f5e",
+              dim: "rgba(244, 63, 94, 0.15)",
+              glow: "rgba(244, 63, 94, 0.35)"
+            },
+            emerald: {
+              DEFAULT: "#10b981",
+              dim: "rgba(16, 185, 129, 0.15)"
+            },
+            amber: {
+              DEFAULT: "#f59e0b",
+              dim: "rgba(245, 158, 11, 0.15)"
+            }
+          },
+          fontFamily: {
+            headline: ["Syne", "sans-serif"],
+            mono: ["Space Grotesk", "monospace"],
+            body: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
+
+  <style>
+    @layer base {
+      html, body {
+        margin: 0;
+        padding: 0;
+        background-color: #0a0e17;
+        color: #e2e8f0;
+        font-family: 'Inter', sans-serif;
+      }
+    }
+
+    /* Subtle custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0e17;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Subtle ambient glass styling */
+    .glass-card {
+      background: #121724;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.5);
+    }
+
+    .glass-card-hover {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card-hover:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.6);
+    }
+
+    .suspect-active {
+      border-color: #f43f5e !important;
+      box-shadow: 0 0 0 1px #f43f5e, 0 8px 30px -4px rgba(244, 63, 94, 0.3) !important;
+    }
+
+    /* Progress bar transitions */
+    .tally-bar {
+      transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Clean pulse animation */
+    @keyframes subtle-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(0.96); }
+    }
+    .animate-subtle-pulse {
+      animation: subtle-pulse 2s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-primary selection:text-white antialiased">
+
+  <!-- TOP NAVIGATION HEADER -->
+  <header class="sticky top-0 z-40 bg-[#0a0e17]/85 backdrop-blur-md border-b border-white/[0.06]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & Brand -->
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.2)]">
+          <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-headline font-bold tracking-wider text-base sm:text-lg text-white">COVERT</span>
+            <span class="text-[10px] font-mono tracking-widest px-1.5 py-0.5 rounded bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">DEDUCTION</span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-mono tracking-wide hidden sm:block">Theft • Undercover • Police</p>
+        </div>
+      </div>
+
+      <!-- Center Session & MongoDB Status -->
+      <div class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900/80 border border-white/[0.08]">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-xs font-mono text-slate-300">SESSION: #882-EX</span>
+        <span class="text-slate-600">•</span>
+        <span id="db-status-badge" class="text-[11px] font-mono text-emerald-400 flex items-center gap-1">
+          <span class="material-symbols-outlined text-[13px]">database</span>
+          <span id="db-status-text">MongoDB Ready</span>
+        </span>
+        <span class="text-slate-600">•</span>
+        <button onclick="copySessionCode()" class="text-[11px] font-mono text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+          <span class="material-symbols-outlined text-[13px]">content_copy</span>
+          <span>Copy Link</span>
+        </button>
+      </div>
+
+      <!-- Action Controls -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Audio Synth Toggle -->
+        <button id="audio-toggle-btn" onclick="toggleAudio()" title="Toggle Sound FX" class="p-2 rounded-lg bg-slate-900 border border-white/[0.08] text-slate-400 hover:text-white hover:border-white/[0.15] transition-all">
+          <span id="audio-icon" class="material-symbols-outlined text-[18px]">volume_up</span>
+        </button>
+
+        <!-- Rules / Dossier Guide Button -->
+        <button onclick="openRulesModal()" class="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-900 border border-white/[0.08] text-slate-300 hover:text-white hover:border-white/[0.15] text-xs font-mono tracking-wider transition-all">
+          <span class="material-symbols-outlined text-[16px]">menu_book</span>
+          <span class="hidden sm:inline">Rules</span>
+        </button>
+
+        <!-- Player Profile Chip -->
+        <div class="flex items-center gap-2 pl-2 border-l border-white/[0.08]">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-400 flex items-center justify-center text-white text-xs font-bold font-mono shadow-sm">
+            ME
+          </div>
+          <div class="hidden lg:flex flex-col text-left">
+            <span class="text-xs font-medium text-slate-200">You (Det. #701)</span>
+            <span class="text-[10px] text-emerald-400 font-mono">Ballot Ready</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN VIEWPORT -->
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex flex-col gap-6">
+
+    <!-- HERO PHASE BANNER & TIMER (Simplified, Elegant) -->
+    <div class="glass-card rounded-2xl p-5 sm:p-6 flex flex-col md:flex-row md:items-center justify-between gap-5 relative overflow-hidden">
+      <!-- Subtle ambient gradient highlight -->
+      <div class="absolute -right-16 -top-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -left-16 -bottom-16 w-64 h-64 bg-rose-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Phase Info -->
+      <div class="flex flex-col gap-1.5 relative z-10 max-w-2xl">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-mono font-semibold uppercase tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
+            Round 1 Elimination
+          </span>
+          <span class="text-xs font-mono text-slate-400">5 Operatives • Plurality Verdict</span>
+        </div>
+        <h1 class="font-headline font-bold text-2xl sm:text-3xl text-white tracking-tight">
+          Elimination Council
+        </h1>
+        <p class="text-sm text-slate-400 leading-relaxed">
+          The clue exchange has concluded. Cross-examine everyone's submitted clue words, detect the outlier, and cast your ballot to isolate the suspected Undercover agent.
+        </p>
+      </div>
+
+      <!-- Integrated Lockdown Timer -->
+      <div class="flex items-center gap-4 self-start md:self-auto bg-slate-900/90 border border-white/[0.08] px-4 py-3 rounded-xl relative z-10 shadow-lg">
+        <div class="relative w-12 h-12 flex items-center justify-center">
+          <svg class="w-12 h-12 -rotate-90" viewBox="0 0 48 48">
+            <circle class="text-slate-800" stroke-width="3.5" stroke="currentColor" fill="none" cx="24" cy="24" r="20"></circle>
+            <circle id="timer-ring" class="text-rose-500 transition-all duration-1000" stroke-width="3.5" stroke-dasharray="125.6" stroke-dashoffset="25" stroke-linecap="round" stroke="currentColor" fill="none" cx="24" cy="24" r="20"></circle>
+          </svg>
+          <span class="material-symbols-outlined text-rose-400 text-[18px] absolute">hourglass_top</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-mono tracking-widest uppercase text-slate-400 block">Voting Lockdown</span>
+          <div class="flex items-baseline gap-1.5">
+            <span id="countdown-display" class="font-mono text-2xl font-bold text-rose-400 tracking-wider">01:45</span>
+            <button onclick="toggleTimerPause()" id="timer-pause-btn" class="text-[11px] font-mono text-slate-400 hover:text-white transition-colors" title="Pause or Resume Timer">
+              Pause
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CLUE COMPARISON QUICK STRIP (Solves Social Deduction Game Clarity) -->
+    <div class="glass-card rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 text-xs">
+      <div class="flex items-center gap-2 text-slate-300 font-mono">
+        <span class="material-symbols-outlined text-indigo-400 text-[18px]">spellcheck</span>
+        <span class="font-semibold uppercase tracking-wider">Clue Ledger:</span>
+        <span class="text-slate-400">Detectives share a secret theme. Spot the anomaly word.</span>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="px-2 py-1 rounded bg-slate-800/80 border border-white/[0.06] font-mono text-slate-300">Marcus: <strong class="text-indigo-300">"Vault"</strong></span>
+        <span class="px-2 py-1 rounded bg-slate-800/80 border border-white/[0.06] font-mono text-slate-300">Elena: <strong class="text-indigo-300">"Safehouse"</strong></span>
+        <span class="px-2 py-1 rounded bg-rose-500/15 border border-rose-500/30 font-mono text-rose-300">Alex: <strong>"Keypad"</strong> (Outlier)</span>
+        <span class="px-2 py-1 rounded bg-slate-800/80 border border-white/[0.06] font-mono text-slate-300">Devon: <strong class="text-indigo-300">"Bank"</strong></span>
+        <span class="px-2 py-1 rounded bg-slate-800/80 border border-white/[0.06] font-mono text-slate-300">Sora: <strong class="text-indigo-300">"Alarm"</strong></span>
+      </div>
+    </div>
+
+    <!-- SUSPECT LINEUP SECTION -->
+    <section>
+      <div class="flex items-center justify-between mb-3.5">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-indigo-400 text-[20px]">group</span>
+          <h2 class="font-headline font-bold text-lg text-white tracking-wide">
+            Suspect Operatives
+          </h2>
+          <span class="text-xs font-mono text-slate-400">• Click to inspect & target</span>
+        </div>
+        <div class="text-xs font-mono text-slate-400 hidden sm:block">
+          Target: <span id="current-target-header" class="text-rose-400 font-bold">ALEX (3 Votes)</span>
+        </div>
+      </div>
+
+      <!-- 5 Operative Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5" id="suspects-container">
+
+        <!-- Suspect 1: Marcus -->
+        <div onclick="selectSuspect('Marcus')" data-suspect="Marcus" class="suspect-card glass-card glass-card-hover rounded-xl p-3.5 flex flex-col justify-between cursor-pointer border border-white/[0.08]">
+          <div>
+            <!-- Header Tag & Vote Chip -->
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-[11px] font-mono text-slate-400 font-semibold">#01 // DET</span>
+              <span class="vote-badge px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-slate-800 text-slate-300 border border-white/[0.05]">
+                1 Vote
+              </span>
+            </div>
+
+            <!-- Avatar Thumbnail -->
+            <div class="relative aspect-square w-full rounded-lg overflow-hidden bg-slate-900 mb-3 border border-white/[0.06] flex items-center justify-center">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJz-81MpZJJTRomMFfy6rQknDyeMqj-ovYqopjsxCudFYWfxTCp-eiIbEUMZ8oT9MotadXYtHQEnuSRIpglGE5TWXfcIYp3ChSfr2KkdK9k-4nWrV1y7mleh0jHuXjEeYn2xvz_wZno26YgHJeWiKFRVlEX5S31_3JBZ-THhG18-7D-VnfNjIvgm-WJVZSiyDAvS90rFQDzAF4iclwB8kBVVYG-L1PCfuSPMWNoHA" 
+                   alt="Operative Marcus" 
+                   onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-indigo-400 bg-slate-900\'><span class=\'material-symbols-outlined text-[42px]\'>person</span><span class=\'text-[10px] font-mono text-slate-400\'>OP-01</span></div>';"
+                   class="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-300"/>
+              <div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                <span>Badge #719</span>
+              </div>
+            </div>
+
+            <!-- Operative Info -->
+            <div class="flex items-baseline justify-between mb-1">
+              <h3 class="font-headline font-bold text-base text-white">Marcus</h3>
+              <span class="text-[10px] font-mono text-slate-400 uppercase">Active</span>
+            </div>
+
+            <!-- Submitted Clue -->
+            <div class="p-2 rounded bg-slate-900/80 border border-white/[0.05] mb-3">
+              <span class="text-[10px] font-mono text-slate-400 uppercase block">Clue</span>
+              <span class="font-mono font-bold text-indigo-300 text-sm">"Vault"</span>
+            </div>
+          </div>
+
+          <button type="button" class="suspect-btn w-full py-1.5 px-2.5 rounded-lg text-xs font-mono font-semibold uppercase tracking-wider bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
+            Target
+          </button>
+        </div>
+
+        <!-- Suspect 2: Elena -->
+        <div onclick="selectSuspect('Elena')" data-suspect="Elena" class="suspect-card glass-card glass-card-hover rounded-xl p-3.5 flex flex-col justify-between cursor-pointer border border-white/[0.08]">
+          <div>
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-[11px] font-mono text-slate-400 font-semibold">#02 // DET</span>
+              <span class="vote-badge px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-slate-800 text-slate-300 border border-white/[0.05]">
+                0 Votes
+              </span>
+            </div>
+
+            <div class="relative aspect-square w-full rounded-lg overflow-hidden bg-slate-900 mb-3 border border-white/[0.06] flex items-center justify-center">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFNRcoS6oFu3FJ1Bm7BhjJSUHFEeAEA9r21qgNymb7iEvZQMDJ5iZQ6nhZsK-5ci8Yg0DIvm0T_Z08j8Po4KlVcawKPs6z9ALzXf_x2OtF5eQeeFKCaomvGPi4yHmAx4s8djLKjHkf_eq2Wv3qCfU18HJZ5_l5neQ0DtBBnDORwoeuK5n6Qf-0KyP7zxlAIbYUv9EuVMu3d72btEtCP9DHIwFXw36OjyniaquBcpw" 
+                   alt="Operative Elena" 
+                   onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-indigo-400 bg-slate-900\'><span class=\'material-symbols-outlined text-[42px]\'>person</span><span class=\'text-[10px] font-mono text-slate-400\'>OP-02</span></div>';"
+                   class="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-300"/>
+              <div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                <span>Badge #402</span>
+              </div>
+            </div>
+
+            <div class="flex items-baseline justify-between mb-1">
+              <h3 class="font-headline font-bold text-base text-white">Elena</h3>
+              <span class="text-[10px] font-mono text-slate-400 uppercase">Active</span>
+            </div>
+
+            <div class="p-2 rounded bg-slate-900/80 border border-white/[0.05] mb-3">
+              <span class="text-[10px] font-mono text-slate-400 uppercase block">Clue</span>
+              <span class="font-mono font-bold text-indigo-300 text-sm">"Safehouse"</span>
+            </div>
+          </div>
+
+          <button type="button" class="suspect-btn w-full py-1.5 px-2.5 rounded-lg text-xs font-mono font-semibold uppercase tracking-wider bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
+            Target
+          </button>
+        </div>
+
+        <!-- Suspect 3: Alex (Active Default / Leading Suspect) -->
+        <div onclick="selectSuspect('Alex')" data-suspect="Alex" class="suspect-card glass-card glass-card-hover suspect-active rounded-xl p-3.5 flex flex-col justify-between cursor-pointer relative bg-slate-900/90">
+          <!-- Leading suspect banner -->
+          <div class="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-rose-500 text-white font-mono text-[10px] font-bold uppercase tracking-wider shadow-md">
+            Leading Suspect
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between mb-2.5 pt-1">
+              <span class="text-[11px] font-mono text-rose-400 font-bold">#03 // PRIME</span>
+              <span class="vote-badge px-2 py-0.5 rounded-full text-[11px] font-mono font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                3 Votes
+              </span>
+            </div>
+
+            <div class="relative aspect-square w-full rounded-lg overflow-hidden bg-slate-900 mb-3 border border-rose-500/30 flex items-center justify-center">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDefvswFTy0wXQNbVEys7SRW6R4w-M-lqXP5Zsz66NO7ORwrnWA_Zh7WBUEprzjhqMvMdGnDVSNY3OuGKxPh2n-EIe0mEDlRjLY2QYk0Ch_3TZneISTPgMp-U3WfEAbFS-dBuiQmIF_oyvfJhCZbYu2C1bg4l0RbyQulv1A5SYF5SVHE2uJt8tc5YZVT9pTtcryvFTZPSjXNvqSrimK8J4OmPSq304mr9RmIUD5eEw" 
+                   alt="Operative Alex" 
+                   onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-rose-400 bg-slate-900\'><span class=\'material-symbols-outlined text-[42px]\'>person</span><span class=\'text-[10px] font-mono text-rose-400\'>OP-03 (PRIME)</span></div>';"
+                   class="w-full h-full object-cover contrast-125 transition-all duration-300"/>
+              <div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/80 backdrop-blur-sm text-[10px] font-mono text-rose-400 flex items-center gap-1 font-semibold">
+                <span class="w-1 h-1 rounded-full bg-rose-500 animate-pulse"></span>
+                <span>Suspect #310</span>
+              </div>
+            </div>
+
+            <div class="flex items-baseline justify-between mb-1">
+              <h3 class="font-headline font-bold text-base text-rose-400">Alex</h3>
+              <span class="text-[10px] font-mono text-rose-400 font-bold uppercase">Prime Suspect</span>
+            </div>
+
+            <div class="p-2 rounded bg-rose-500/10 border border-rose-500/25 mb-3">
+              <span class="text-[10px] font-mono text-rose-400 uppercase block font-semibold">Clue (Outlier)</span>
+              <span class="font-mono font-bold text-white text-sm">"Keypad"</span>
+            </div>
+          </div>
+
+          <button type="button" class="suspect-btn w-full py-1.5 px-2.5 rounded-lg text-xs font-mono font-semibold uppercase tracking-wider bg-rose-500 text-white shadow-sm hover:bg-rose-600 transition-colors">
+            Target Locked
+          </button>
+        </div>
+
+        <!-- Suspect 4: Devon -->
+        <div onclick="selectSuspect('Devon')" data-suspect="Devon" class="suspect-card glass-card glass-card-hover rounded-xl p-3.5 flex flex-col justify-between cursor-pointer border border-white/[0.08]">
+          <div>
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-[11px] font-mono text-slate-400 font-semibold">#04 // DET</span>
+              <span class="vote-badge px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-slate-800 text-slate-300 border border-white/[0.05]">
+                0 Votes
+              </span>
+            </div>
+
+            <div class="relative aspect-square w-full rounded-lg overflow-hidden bg-slate-900 mb-3 border border-white/[0.06] flex items-center justify-center">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOdsD-90jyp7KUqzhjyj0kFJVombDDFtRmClkhsxYlEGuTk_1ICoKvB2vehTg2nic6xXvhzN2bf5pmricJQb4HMEpF788vfpcPnUC5s1PWZGGpb2grCnFMA_J2KcLmhDq0hOyC-eSHZ9ftdj92_gC8yg-mPJYG4CV7fJNeIXgrjlCTLJQv8imfZ4wgSKcA8xVCHf16CVTbODgGYubfJuB4D-x9GP-fq9xZlZg7mYQ" 
+                   alt="Operative Devon" 
+                   onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-indigo-400 bg-slate-900\'><span class=\'material-symbols-outlined text-[42px]\'>person</span><span class=\'text-[10px] font-mono text-slate-400\'>OP-04</span></div>';"
+                   class="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-300"/>
+              <div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                <span>Badge #512</span>
+              </div>
+            </div>
+
+            <div class="flex items-baseline justify-between mb-1">
+              <h3 class="font-headline font-bold text-base text-white">Devon</h3>
+              <span class="text-[10px] font-mono text-slate-400 uppercase">Active</span>
+            </div>
+
+            <div class="p-2 rounded bg-slate-900/80 border border-white/[0.05] mb-3">
+              <span class="text-[10px] font-mono text-slate-400 uppercase block">Clue</span>
+              <span class="font-mono font-bold text-indigo-300 text-sm">"Bank"</span>
+            </div>
+          </div>
+
+          <button type="button" class="suspect-btn w-full py-1.5 px-2.5 rounded-lg text-xs font-mono font-semibold uppercase tracking-wider bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
+            Target
+          </button>
+        </div>
+
+        <!-- Suspect 5: Sora -->
+        <div onclick="selectSuspect('Sora')" data-suspect="Sora" class="suspect-card glass-card glass-card-hover rounded-xl p-3.5 flex flex-col justify-between cursor-pointer border border-white/[0.08]">
+          <div>
+            <div class="flex items-center justify-between mb-2.5">
+              <span class="text-[11px] font-mono text-slate-400 font-semibold">#05 // DET</span>
+              <span class="vote-badge px-2 py-0.5 rounded-full text-[11px] font-mono font-medium bg-slate-800 text-slate-300 border border-white/[0.05]">
+                1 Vote
+              </span>
+            </div>
+
+            <div class="relative aspect-square w-full rounded-lg overflow-hidden bg-slate-900 mb-3 border border-white/[0.06] flex items-center justify-center">
+              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC3AZ7dSqqIC1cTSZUjYgt-3exOfuV9K9P6dVCkqD-XNCqBtdAR3rlpJyHcOa_yUSibdPwi5iYlB7kedlRK778oV3_L3e7EQ7HDAIJpCmyKg1SrRGllPhluXJyvgGq71jJ21_WYvkEZ0j4C8r99VjhnhhKm78VNCBWMMPF_XfqoLI1PGGMh4ya8h8tq5908YJY15girkNjWQQJl842cEh7gnplvTl4dtRpoNFDj1PM" 
+                   alt="Operative Sora" 
+                   onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center text-indigo-400 bg-slate-900\'><span class=\'material-symbols-outlined text-[42px]\'>person</span><span class=\'text-[10px] font-mono text-slate-400\'>OP-05</span></div>';"
+                   class="w-full h-full object-cover grayscale contrast-125 hover:grayscale-0 transition-all duration-300"/>
+              <div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-black/70 backdrop-blur-sm text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                <span>Badge #830</span>
+              </div>
+            </div>
+
+            <div class="flex items-baseline justify-between mb-1">
+              <h3 class="font-headline font-bold text-base text-white">Sora</h3>
+              <span class="text-[10px] font-mono text-slate-400 uppercase">Active</span>
+            </div>
+
+            <div class="p-2 rounded bg-slate-900/80 border border-white/[0.05] mb-3">
+              <span class="text-[10px] font-mono text-slate-400 uppercase block">Clue</span>
+              <span class="font-mono font-bold text-indigo-300 text-sm">"Alarm"</span>
+            </div>
+          </div>
+
+          <button type="button" class="suspect-btn w-full py-1.5 px-2.5 rounded-lg text-xs font-mono font-semibold uppercase tracking-wider bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors">
+            Target
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ACTION TERMINAL & LIVE ANALYTICS (2-Column Grid) -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+      <!-- LEFT: Voting & Elimination Console (7 Cols) -->
+      <div class="lg:col-span-7 glass-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-5">
+        <div>
+          <!-- Terminal Header -->
+          <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] mb-4">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-rose-500 text-[20px]">how_to_vote</span>
+              <h2 class="font-headline font-bold text-base sm:text-lg text-white">
+                Council Voting Terminal
+              </h2>
+            </div>
+            <span class="text-xs font-mono text-slate-400">Plurality Exiles Suspect</span>
+          </div>
+
+          <!-- Targeted Suspect Banner Card -->
+          <div class="rounded-xl bg-slate-900/90 border border-white/[0.08] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-xl bg-rose-500/15 border border-rose-500/30 flex items-center justify-center text-rose-400 shrink-0">
+                <span class="material-symbols-outlined text-[26px]">person_cancel</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-mono tracking-wider uppercase text-slate-400 block">Target Selected:</span>
+                <h3 id="target-title-display" class="font-headline font-bold text-lg text-rose-400">
+                  OPERATIVE ALEX
+                </h3>
+                <p id="target-clue-display" class="text-xs text-slate-400 mt-0.5">
+                  Accused for outlier clue: <span class="text-white font-mono font-semibold">"Keypad"</span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Cast Ballot CTA Button -->
+            <button id="vote-action-btn" onclick="openConfirmationModal()" type="button" class="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-rose-500 text-white font-mono text-xs font-bold uppercase tracking-wider hover:bg-rose-600 active:scale-95 transition-all shadow-[0_0_20px_rgba(244,63,94,0.35)] flex items-center justify-center gap-2 shrink-0">
+              <span class="material-symbols-outlined text-[18px]">verified</span>
+              <span>Cast Elimination Ballot</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Emergency Council Actions & Interrogation Simulation -->
+        <div class="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-white/[0.06]">
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button onclick="triggerEmergency('tiebreaker')" type="button" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition-colors flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px]">shuffle</span>
+              <span>Reset Votes</span>
+            </button>
+            <button onclick="triggerEmergency('clue2')" type="button" class="flex-1 sm:flex-initial px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono transition-colors flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-[15px]">add_circle</span>
+              <span>Request Clue R2</span>
+            </button>
+          </div>
+
+          <!-- Interrogate / Reveal True Identity Button -->
+          <button onclick="openVerdictModal()" type="button" class="w-full sm:w-auto px-3.5 py-1.5 rounded-lg bg-indigo-500/15 border border-indigo-500/30 hover:bg-indigo-500/25 text-indigo-300 text-xs font-mono font-medium transition-colors flex items-center justify-center gap-1.5">
+            <span class="material-symbols-outlined text-[16px]">visibility</span>
+            <span>Simulate Interrogation Reveal</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Live Council Tally & Predictions (5 Cols) -->
+      <div class="lg:col-span-5 glass-card rounded-2xl p-5 sm:p-6 flex flex-col justify-between gap-5">
+        <div>
+          <!-- Tally Header -->
+          <div class="flex items-center justify-between pb-3 border-b border-white/[0.06] mb-4">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-amber-400 text-[20px]">query_stats</span>
+              <h2 class="font-headline font-bold text-base sm:text-lg text-white">
+                Live Council Tally
+              </h2>
+            </div>
+            <span id="total-ballots-count" class="px-2 py-0.5 rounded bg-slate-800 text-[11px] font-mono text-amber-300 border border-white/[0.06]">
+              5 Ballots Registered
+            </span>
+          </div>
+
+          <!-- Progress Bar Tally Roster -->
+          <div class="flex flex-col gap-3.5">
+            <!-- Alex Progress -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-rose-400 font-bold flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-rose-500"></span> Alex (Plurality)
+                </span>
+                <span id="alex-tally-pct" class="text-slate-300">3 Votes (60%)</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div id="alex-bar" class="tally-bar h-full bg-rose-500 rounded-full" style="width: 60%"></div>
+              </div>
+            </div>
+
+            <!-- Marcus Progress -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-slate-300 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-indigo-400"></span> Marcus
+                </span>
+                <span id="marcus-tally-pct" class="text-slate-400">1 Vote (20%)</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div id="marcus-bar" class="tally-bar h-full bg-indigo-500 rounded-full" style="width: 20%"></div>
+              </div>
+            </div>
+
+            <!-- Sora Progress -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-slate-300 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-indigo-400"></span> Sora
+                </span>
+                <span id="sora-tally-pct" class="text-slate-400">1 Vote (20%)</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div id="sora-bar" class="tally-bar h-full bg-indigo-500 rounded-full" style="width: 20%"></div>
+              </div>
+            </div>
+
+            <!-- Elena & Devon Progress -->
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center justify-between text-xs font-mono">
+                <span class="text-slate-400 flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-slate-600"></span> Elena & Devon
+                </span>
+                <span id="other-tally-pct" class="text-slate-500">0 Votes (0%)</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+                <div id="other-bar" class="tally-bar h-full bg-slate-600 rounded-full" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Syndicate AI Vector Note -->
+        <div class="p-3 rounded-xl bg-slate-900/80 border border-white/[0.06] flex items-center justify-between text-xs font-mono">
+          <span class="text-slate-400">Consensus Prediction:</span>
+          <span class="text-rose-400 font-bold">82% Probability Undercover</span>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- CONFIRMATION VOTE MODAL -->
+  <div id="confirm-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card max-w-md w-full rounded-2xl p-6 border border-white/[0.12] shadow-2xl relative animate-in fade-in zoom-in-95 duration-200">
+      <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center gap-2 text-rose-400">
+          <span class="material-symbols-outlined text-[24px]">crisis_alert</span>
+          <h3 class="font-headline font-bold text-lg text-white">Confirm Indictment</h3>
+        </div>
+        <button onclick="closeConfirmationModal()" class="text-slate-400 hover:text-white p-1">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-900 border border-white/[0.06] mb-4">
+        <p class="text-xs text-slate-400 mb-1">You are casting your irrevocable council vote against:</p>
+        <div class="font-headline font-bold text-lg text-rose-400" id="modal-suspect-display">
+          OPERATIVE ALEX
+        </div>
+        <p class="text-[11px] text-slate-400 mt-2">
+          If this operative is an innocent Detective, the Undercover faction gains significant tactical control for the next round.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5">
+        <button onclick="closeConfirmationModal()" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs transition-colors">
+          Abort
+        </button>
+        <button onclick="executeVoteSubmission()" type="button" class="px-5 py-2 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors shadow-md shadow-rose-500/30">
+          Transmit Ballot
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERDICT / INTERROGATION REVEAL MODAL -->
+  <div id="verdict-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card max-w-lg w-full rounded-2xl p-6 border border-white/[0.12] shadow-2xl relative">
+      <div class="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-5">
+        <div class="flex items-center gap-2 text-rose-400">
+          <span class="material-symbols-outlined text-[22px]">lock_open</span>
+          <h3 class="font-headline font-bold text-lg text-white">Interrogation Chamber Verdict</h3>
+        </div>
+        <button onclick="closeVerdictModal()" class="text-slate-400 hover:text-white p-1">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
+        <div class="p-3.5 rounded-xl bg-slate-900 border border-white/[0.06]">
+          <span class="text-[10px] font-mono text-slate-400 uppercase block mb-1">Condemned Operative</span>
+          <h4 class="font-headline font-bold text-base text-white">Operative Alex</h4>
+          <span class="text-xs text-rose-400 font-mono">Isolated by Plurality (3 Votes)</span>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/25">
+          <span class="text-[10px] font-mono text-rose-400 uppercase block mb-1">True Identity Cracked</span>
+          <h4 class="font-headline font-bold text-base text-rose-400 flex items-center gap-1.5">
+            <span>UNDERCOVER</span>
+            <span class="material-symbols-outlined text-[18px]">theater_comedy</span>
+          </h4>
+          <span class="text-xs text-slate-300 font-mono">Secret Counter-Word: <strong>"PINCODE"</strong></span>
+        </div>
+      </div>
+
+      <div class="p-4 rounded-xl bg-slate-900 border border-white/[0.06] mb-5">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-xs font-mono text-emerald-400 font-semibold uppercase">Round 1 Outcome: Police Triumph</span>
+          <span class="text-xs font-mono text-emerald-400 font-bold">+100 Police Points</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">
+          The detectives correctly isolated Alex! However, the elusive <strong>Thief</strong> is still hiding among Marcus, Elena, Devon, and Sora. Round 2 will commence immediately.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2.5">
+        <button onclick="closeVerdictModal()" type="button" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-mono text-xs transition-colors">
+          Close Dossier
+        </button>
+        <button onclick="resetGameToRoundTwo()" type="button" class="px-5 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-mono text-xs font-bold uppercase tracking-wider transition-colors shadow-md shadow-indigo-500/30">
+          Begin Round 2
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW TO PLAY RULES MODAL -->
+  <div id="rules-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="glass-card max-w-xl w-full rounded-2xl p-6 border border-white/[0.12] shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-3 border-b border-white/[0.08] mb-4">
+        <div class="flex items-center gap-2 text-indigo-400">
+          <span class="material-symbols-outlined text-[22px]">help_center</span>
+          <h3 class="font-headline font-bold text-lg text-white">Covert Protocol: How To Play</h3>
+        </div>
+        <button onclick="closeRulesModal()" class="text-slate-400 hover:text-white p-1">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+
+      <div class="flex flex-col gap-3 text-xs leading-relaxed text-slate-300 mb-6">
+        <div class="p-3.5 rounded-xl bg-slate-900 border border-white/[0.06]">
+          <h4 class="font-bold text-emerald-400 font-mono mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span> Detectives (Civilian Operatives)
+          </h4>
+          <p>
+            You receive the shared confidential keyword (e.g., <em>"Safe"</em>). Give precise, subtle clues to prove you know the word without revealing it to the Thief!
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-900 border border-white/[0.06]">
+          <h4 class="font-bold text-amber-400 font-mono mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span> Undercover Agent
+          </h4>
+          <p>
+            You receive a slightly different word (e.g., <em>"Keypad"</em> or <em>"Pincode"</em>). You don't realize you have a different word until clues begin to deviate! Blend in and survive the vote.
+          </p>
+        </div>
+
+        <div class="p-3.5 rounded-xl bg-slate-900 border border-white/[0.06]">
+          <h4 class="font-bold text-rose-400 font-mono mb-1 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-rose-400"></span> The Thief (Mr. White)
+          </h4>
+          <p>
+            You receive NO word at all! Listen carefully to other players' clues, improvise a plausible clue, and if voted out, you can still steal the win by guessing the Detectives' word!
+          </p>
+        </div>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="closeRulesModal()" type="button" class="px-5 py-2 rounded-xl bg-indigo-500 hover:bg-indigo-600 text-white font-mono text-xs font-bold transition-colors">
+          Understood, Return to Council
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="app-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-32 transition-transform duration-300 ease-out flex items-center gap-2.5 px-4 py-3 rounded-xl bg-slate-900 border border-white/[0.15] text-white shadow-2xl">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 shrink-0"></span>
+    <span id="toast-message" class="text-xs font-mono font-medium">Ballot Confirmed</span>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="mt-auto border-t border-white/[0.06] bg-[#080b12] py-4 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+        <span>Covert Syndicate Protocol v5.0</span>
+      </div>
+      <p class="text-[11px] text-slate-500">Production-ready for Google Deployment • Zero Bloat</p>
+    </div>
+  </footer>
+
+  <!-- INTERACTIVE APPLICATION SCRIPT -->
+  <script>
+    // Game State
+    let selectedSuspect = 'Alex';
+    let countdownSeconds = 105;
+    let timerPaused = false;
+    let audioEnabled = true;
+    let hasVoted = false;
+
+    const suspectsData = {
+      Marcus: { name: 'Marcus', badge: '#719', clue: 'Vault', votes: 1, role: 'Detective' },
+      Elena: { name: 'Elena', badge: '#402', clue: 'Safehouse', votes: 0, role: 'Detective' },
+      Alex: { name: 'Alex', badge: '#310', clue: 'Keypad', votes: 3, role: 'Undercover' },
+      Devon: { name: 'Devon', badge: '#512', clue: 'Bank', votes: 0, role: 'Detective' },
+      Sora: { name: 'Sora', badge: '#830', clue: 'Alarm', votes: 1, role: 'Detective' }
+    };
+
+    // Web Audio Synthesizer (Zero external dependencies)
+    let audioCtx = null;
+    function playBeep(freq = 600, duration = 0.08, type = 'sine') {
+      if (!audioEnabled) return;
+      try {
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {
+        // Fallback gracefully
+      }
+    }
+
+    function toggleAudio() {
+      audioEnabled = !audioEnabled;
+      const icon = document.getElementById('audio-icon');
+      if (icon) {
+        icon.innerText = audioEnabled ? 'volume_up' : 'volume_off';
+      }
+      showToast(audioEnabled ? 'Audio Sound FX Enabled' : 'Audio Sound FX Muted');
+      if (audioEnabled) playBeep(880, 0.1);
+    }
+
+    // Select Suspect Handler
+    function selectSuspect(name) {
+      selectedSuspect = name;
+      playBeep(520, 0.06);
+
+      document.querySelectorAll('.suspect-card').forEach(card => {
+        const isSelected = card.getAttribute('data-suspect') === name;
+        const btn = card.querySelector('.suspect-btn');
+
+        if (isSelected) {
+          card.classList.add('suspect-active');
+          if (btn) {
+            btn.classList.remove('bg-slate-800', 'text-slate-300');
+            btn.classList.add('bg-rose-500', 'text-white');
+            btn.innerText = 'Target Locked';
+          }
+        } else {
+          card.classList.remove('suspect-active');
+          if (btn) {
+            btn.classList.remove('bg-rose-500', 'text-white');
+            btn.classList.add('bg-slate-800', 'text-slate-300');
+            btn.innerText = 'Target';
+          }
+        }
+      });
+
+      // Update Header & Console
+      const targetHeader = document.getElementById('current-target-header');
+      if (targetHeader) {
+        const votes = suspectsData[name] ? suspectsData[name].votes : 0;
+        targetHeader.innerText = `${name.toUpperCase()} (${votes} ${votes === 1 ? 'Vote' : 'Votes'})`;
+      }
+
+      const titleDisplay = document.getElementById('target-title-display');
+      if (titleDisplay) {
+        titleDisplay.innerText = `OPERATIVE ${name.toUpperCase()}`;
+      }
+
+      const clueDisplay = document.getElementById('target-clue-display');
+      if (clueDisplay && suspectsData[name]) {
+        clueDisplay.innerHTML = `Accused for clue: <span class="text-white font-mono font-semibold">"${suspectsData[name].clue}"</span>`;
+      }
+    }
+
+    // Modals
+    function openConfirmationModal() {
+      if (hasVoted) {
+        showToast('You have already submitted your ballot for this round');
+        return;
+      }
+      playBeep(440, 0.1);
+      const modal = document.getElementById('confirm-modal');
+      const nameEl = document.getElementById('modal-suspect-display');
+      if (nameEl) nameEl.innerText = `OPERATIVE ${selectedSuspect.toUpperCase()}`;
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeConfirmationModal() {
+      const modal = document.getElementById('confirm-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function executeVoteSubmission() {
+      closeConfirmationModal();
+      hasVoted = true;
+      playBeep(780, 0.2, 'triangle');
+      showToast(`Ballot locked against ${selectedSuspect}`);
+
+      const btn = document.getElementById('vote-action-btn');
+      if (btn) {
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">check_circle</span><span>Ballot Locked</span>';
+        btn.classList.remove('bg-rose-500', 'hover:bg-rose-600');
+        btn.classList.add('bg-slate-800', 'text-slate-400', 'cursor-not-allowed');
+      }
+
+      // Sync vote to MongoDB API
+      fetch('/api/room/882-EX/vote', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target: selectedSuspect, voter: 'You' })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.room && data.room.players) {
+          data.room.players.forEach(p => {
+            if (suspectsData[p.name]) suspectsData[p.name].votes = p.votes;
+          });
+          updateTally();
+        }
+      })
+      .catch(() => {
+        // Fallback local update
+        if (suspectsData[selectedSuspect]) {
+          suspectsData[selectedSuspect].votes++;
+          updateTally();
+        }
+      });
+    }
+
+    function openVerdictModal() {
+      playBeep(650, 0.15);
+      const modal = document.getElementById('verdict-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeVerdictModal() {
+      const modal = document.getElementById('verdict-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function resetGameToRoundTwo() {
+      closeVerdictModal();
+      showToast('Starting Round 2 • New Clues Active');
+      playBeep(880, 0.25);
+      countdownSeconds = 120;
+    }
+
+    function openRulesModal() {
+      playBeep(520, 0.08);
+      const modal = document.getElementById('rules-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeRulesModal() {
+      const modal = document.getElementById('rules-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    // Emergency Triggers
+    function triggerEmergency(type) {
+      playBeep(350, 0.12);
+      if (type === 'tiebreaker') {
+        hasVoted = false;
+        const btn = document.getElementById('vote-action-btn');
+        if (btn) {
+          btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">verified</span><span>Cast Elimination Ballot</span>';
+          btn.classList.add('bg-rose-500', 'hover:bg-rose-600', 'text-white');
+          btn.classList.remove('bg-slate-800', 'text-slate-400', 'cursor-not-allowed');
+        }
+        showToast('Council Ballots Reset • Tiebreaker Active');
+
+        // Sync reset to MongoDB API
+        fetch('/api/room/882-EX/reset', { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            Object.keys(suspectsData).forEach(k => suspectsData[k].votes = 0);
+            updateTally();
+          })
+          .catch(() => {
+            Object.keys(suspectsData).forEach(k => suspectsData[k].votes = 0);
+            updateTally();
+          });
+      } else {
+        showToast('Voting Paused: Additional Clue Round Granted');
+      }
+    }
+
+    // Timer Controls
+    function toggleTimerPause() {
+      timerPaused = !timerPaused;
+      const btn = document.getElementById('timer-pause-btn');
+      if (btn) btn.innerText = timerPaused ? 'Resume' : 'Pause';
+      showToast(timerPaused ? 'Timer Paused' : 'Timer Resumed');
+    }
+
+    setInterval(() => {
+      if (!timerPaused && countdownSeconds > 0) {
+        countdownSeconds--;
+        const mins = Math.floor(countdownSeconds / 60);
+        const secs = countdownSeconds % 60;
+        const formatted = String(mins).padStart(2, '0') + ':' + String(secs).padStart(2, '0');
+        
+        const display = document.getElementById('countdown-display');
+        if (display) display.innerText = formatted;
+
+        const ring = document.getElementById('timer-ring');
+        if (ring) {
+          const totalLength = 125.6;
+          const pct = countdownSeconds / 105;
+          ring.style.strokeDashoffset = totalLength * (1 - pct);
+        }
+
+        // Ticking audio cue on last 10 seconds
+        if (countdownSeconds <= 10 && countdownSeconds > 0) {
+          playBeep(920, 0.04);
+        }
+      }
+    }, 1000);
+
+    // Toast Utility
+    function showToast(msg) {
+      const toast = document.getElementById('app-toast');
+      const text = document.getElementById('toast-message');
+      if (toast && text) {
+        text.innerText = msg;
+        toast.classList.remove('translate-y-32');
+        setTimeout(() => {
+          toast.classList.add('translate-y-32');
+        }, 3200);
+      }
+    }
+
+    function copySessionCode() {
+      navigator.clipboard.writeText(window.location.href);
+      playBeep(700, 0.08);
+      showToast('Session Link Copied to Clipboard');
+    }
+
+    function updateTally() {
+      // Re-calculate vote totals
+      let total = 0;
+      Object.values(suspectsData).forEach(s => total += s.votes);
+      const totalEl = document.getElementById('total-ballots-count');
+      if (totalEl) totalEl.innerText = `${total} Ballots Registered`;
+
+      // Update card vote chips
+      document.querySelectorAll('.suspect-card').forEach(card => {
+        const name = card.getAttribute('data-suspect');
+        const badge = card.querySelector('.vote-badge');
+        if (name && badge && suspectsData[name]) {
+          const v = suspectsData[name].votes;
+          badge.innerText = `${v} ${v === 1 ? 'Vote' : 'Votes'}`;
+        }
+      });
+
+      // Update progress bars
+      const alexVotes = suspectsData.Alex ? suspectsData.Alex.votes : 0;
+      const marcusVotes = suspectsData.Marcus ? suspectsData.Marcus.votes : 0;
+      const soraVotes = suspectsData.Sora ? suspectsData.Sora.votes : 0;
+      const otherVotes = (suspectsData.Elena ? suspectsData.Elena.votes : 0) + (suspectsData.Devon ? suspectsData.Devon.votes : 0);
+
+      const alexPct = total > 0 ? Math.round((alexVotes / total) * 100) : 0;
+      const marcusPct = total > 0 ? Math.round((marcusVotes / total) * 100) : 0;
+      const soraPct = total > 0 ? Math.round((soraVotes / total) * 100) : 0;
+      const otherPct = total > 0 ? Math.round((otherVotes / total) * 100) : 0;
+
+      const alexBar = document.getElementById('alex-bar');
+      const alexPctEl = document.getElementById('alex-tally-pct');
+      if (alexBar) alexBar.style.width = `${alexPct}%`;
+      if (alexPctEl) alexPctEl.innerText = `${alexVotes} Votes (${alexPct}%)`;
+
+      const marcusBar = document.getElementById('marcus-bar');
+      const marcusPctEl = document.getElementById('marcus-tally-pct');
+      if (marcusBar) marcusBar.style.width = `${marcusPct}%`;
+      if (marcusPctEl) marcusPctEl.innerText = `${marcusVotes} ${marcusVotes === 1 ? 'Vote' : 'Votes'} (${marcusPct}%)`;
+
+      const soraBar = document.getElementById('sora-bar');
+      const soraPctEl = document.getElementById('sora-tally-pct');
+      if (soraBar) soraBar.style.width = `${soraPct}%`;
+      if (soraPctEl) soraPctEl.innerText = `${soraVotes} ${soraVotes === 1 ? 'Vote' : 'Votes'} (${soraPct}%)`;
+
+      const otherBar = document.getElementById('other-bar');
+      const otherPctEl = document.getElementById('other-tally-pct');
+      if (otherBar) otherBar.style.width = `${otherPct}%`;
+      if (otherPctEl) otherPctEl.innerText = `${otherVotes} Votes (${otherPct}%)`;
+    }
+
+    // Backend / MongoDB Synchronization on page load
+    async function initDatabaseSync() {
+      try {
+        const statusRes = await fetch('/api/status');
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          const badge = document.getElementById('db-status-badge');
+          const text = document.getElementById('db-status-text');
+          if (badge && text) {
+            if (statusData.connected) {
+              text.innerText = 'MongoDB Live';
+              badge.className = 'text-[11px] font-mono text-emerald-400 flex items-center gap-1';
+            } else {
+              text.innerText = 'In-Memory (Ready for Mongo)';
+              badge.className = 'text-[11px] font-mono text-amber-400 flex items-center gap-1';
+            }
+          }
+
+          // Fetch current room state from database
+          const roomRes = await fetch('/api/room/882-EX');
+          if (roomRes.ok) {
+            const roomData = await roomRes.json();
+            if (roomData && roomData.room && roomData.room.players) {
+              roomData.room.players.forEach(p => {
+                if (suspectsData[p.name]) {
+                  suspectsData[p.name].votes = p.votes;
+                }
+              });
+              updateTally();
+            }
+          }
+        }
+      } catch (err) {
+        // Running as purely static / offline file
+        const text = document.getElementById('db-status-text');
+        if (text) text.innerText = 'Standalone Frontend';
+      }
+    }
+
+    // Run sync when page loads
+    window.addEventListener('DOMContentLoaded', initDatabaseSync);
+  </script>
+</body>
+</html>
